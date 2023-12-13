@@ -8,11 +8,6 @@ data "aws_cloudwatch_event_bus" "zendesk_partner" {
   name = each.value
 }
 
-data "aws_sns_topic" "event_bridge_test" {
-  name       = "event_bridge_test"
-  depends_on = [module.sns_topic_subscription]
-}
-
 data "aws_iam_policy_document" "sns_topic_policy" {
   statement {
     effect  = "Allow"
@@ -23,6 +18,8 @@ data "aws_iam_policy_document" "sns_topic_policy" {
       identifiers = ["events.amazonaws.com"]
     }
 
-    resources = [data.aws_sns_topic.event_bridge_test.arn]
+    resources = local.sns_topics_arn
   }
+
+  depends_on = [module.sns_topic_subscription]
 }

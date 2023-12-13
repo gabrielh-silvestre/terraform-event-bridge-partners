@@ -19,13 +19,17 @@ resource "aws_cloudwatch_event_rule" "zendesk" {
 }
 
 resource "aws_cloudwatch_event_target" "sns" {
+  for_each = local.sns_topics
+
   rule           = aws_cloudwatch_event_rule.zendesk.name
   target_id      = "SendToSNS"
-  arn            = data.aws_sns_topic.event_bridge_test.arn
+  arn            = each.value.topic_arn
   event_bus_name = local.event_bus_arn
 }
 
 resource "aws_sns_topic_policy" "default" {
-  arn    = data.aws_sns_topic.event_bridge_test.arn
+  for_each = local.sns_topics
+
+  arn    = each.value.topic_arn
   policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
